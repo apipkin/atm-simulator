@@ -1,18 +1,22 @@
 import java.awt.event.ActionEvent;
 import java.awt.Color;
 import java.awt.event.ActionListener;
-import java.awt.GridLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JButton;
-import javax.swing.ButtonGroup;
 import javax.swing.JRadioButton;
+import javax.swing.JTextField;
 
 public class ATMFrame extends JFrame {
 
-    static final int WIDTH = 800,
-                     HEIGHT = 600,
+    static final int WIDTH = 300,
+                     HEIGHT = 200,
                      GUTTER = 50,
                      GRID_GAP = 10;
 
@@ -21,7 +25,9 @@ public class ATMFrame extends JFrame {
                         ACCT_SAVING = "saving";
 
     private JPanel gridPanel = new JPanel();
-    private GridLayout gridLayout = new GridLayout(3,2, GRID_GAP, GRID_GAP);
+    private GridBagLayout gridLayout = new GridBagLayout();
+    private GridBagConstraints gridConstraints = new GridBagConstraints();
+    private Insets gridPadding = new Insets(5, 3, 5, 3);
 
     private JButton withdraw, deposit, transferTo, balance;
 
@@ -29,8 +35,10 @@ public class ATMFrame extends JFrame {
     private String selectedAccount;
     private ButtonGroup group = new ButtonGroup();
 
+    private JTextField input;
 
-    // Radio buttons for accounts should be created based on the number of accounts using the accounts name
+
+    // Radio buttons for accounts should be created based on the number of accounts using the accounts name... Really?
     // use the grid flow
     // buttons should have event handlers attached and them
     // Input field should span a full row
@@ -53,9 +61,11 @@ public class ATMFrame extends JFrame {
 
     private void init() {
         setFrame(WIDTH, HEIGHT);
+        initLayout();
         initPanel();
         initButtons();
         initRadios();
+        initInput();
     }
 
     private void setFrame(int width, int height) {
@@ -64,9 +74,14 @@ public class ATMFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
+    private void initLayout() {
+        gridConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridConstraints.gridx = 0;
+        gridConstraints.gridy = 0;
+    }
+
     private void initPanel() {
         gridPanel.setLayout(gridLayout);
-        gridPanel.setBackground(Color.blue);
         add(gridPanel);
     }
 
@@ -86,7 +101,7 @@ public class ATMFrame extends JFrame {
             }
         });
 
-        gridPanel.add(btn);
+        addCompontent(btn);
     }
 
     private void handleButtonClick(ActionEvent e, String type) {
@@ -111,7 +126,7 @@ public class ATMFrame extends JFrame {
         addRadioButton(savings, "Savings");
     }
 
-    private JRadioButton addRadioButton(JRadioButton btn, String label) {
+    private void addRadioButton(JRadioButton btn, String label) {
         btn = new JRadioButton(label);
         btn.setActionCommand(label.toLowerCase());
         btn.addActionListener(new ActionListener() {
@@ -121,9 +136,8 @@ public class ATMFrame extends JFrame {
         });
 
         group.add(btn);
-        gridPanel.add(btn);
+        addCompontent(btn);
 
-        return btn;
     }
 
     private void handleRadioClick(ActionEvent e) {
@@ -135,6 +149,41 @@ public class ATMFrame extends JFrame {
             case "savings":
                 handleSavingsClick();
                 break;
+        }
+    }
+
+    private void initInput() {
+        input = new JTextField();
+        addCompontent(input, 2);
+    }
+
+
+    private void gridNewRow() {
+        gridConstraints.gridx = 0;
+        gridConstraints.gridy += 1;
+    }
+
+    private void gridNewCol() {
+        gridConstraints.gridx += 1;
+    }
+
+    private void addCompontent(JComponent comp) {
+        addCompontent(comp, 1);
+    }
+
+    private void addCompontent(JComponent comp, int gridWidth) {
+
+        if (gridWidth > 1) {
+            gridConstraints.gridwidth = gridWidth;
+        }
+        gridConstraints.insets = gridPadding;
+
+        gridPanel.add(comp, gridConstraints);
+
+        gridNewCol();
+
+        if (gridConstraints.gridx > 1) {
+            gridNewRow();
         }
     }
 
