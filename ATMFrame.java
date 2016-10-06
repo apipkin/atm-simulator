@@ -32,7 +32,7 @@ public class ATMFrame extends JFrame {
     private JButton withdraw, deposit, transferTo, balance;
 
     private JRadioButton checking, savings;
-    private String selectedAccount;
+    private String selectedAccount = ACCT_CHECKING;
     private ButtonGroup group = new ButtonGroup();
 
     private JTextField input;
@@ -122,11 +122,22 @@ public class ATMFrame extends JFrame {
     }
 
     private void initRadios() {
-        addRadioButton(checking, "Checking");
-        addRadioButton(savings, "Savings");
+        checking = addRadioButton(checking, "Checking");
+        savings = addRadioButton(savings, "Savings");
+
+        switch (selectedAccount) {
+            case ACCT_CHECKING:
+                checking.setSelected(true);
+                group.setSelected(checking.getModel(), true);
+                break;
+            case ACCT_SAVING:
+                savings.setSelected(true);
+                group.setSelected(savings.getModel(), true);
+                break;
+        }
     }
 
-    private void addRadioButton(JRadioButton btn, String label) {
+    private JRadioButton addRadioButton(JRadioButton btn, String label) {
         btn = new JRadioButton(label);
         btn.setActionCommand(label.toLowerCase());
         btn.addActionListener(new ActionListener() {
@@ -138,6 +149,7 @@ public class ATMFrame extends JFrame {
         group.add(btn);
         addCompontent(btn);
 
+        return btn;
     }
 
     private void handleRadioClick(ActionEvent e) {
