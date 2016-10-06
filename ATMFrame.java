@@ -39,9 +39,6 @@ public class ATMFrame extends JFrame {
 
 
     // Radio buttons for accounts should be created based on the number of accounts using the accounts name... Really?
-    // use the grid flow
-    // buttons should have event handlers attached and them
-    // Input field should span a full row
 
     // TODO: Look up JOptionPane use
 
@@ -60,12 +57,16 @@ public class ATMFrame extends JFrame {
     }
 
     private void init() {
+        render();
+    }
+    
+    private void render() {
         setFrame(WIDTH, HEIGHT);
-        initLayout();
-        initPanel();
-        initButtons();
-        initRadios();
-        initInput();
+        renderLayout();
+        renderPanel();
+        renderButtons();
+        renderRadios();
+        renderInput();
     }
 
     private void setFrame(int width, int height) {
@@ -74,18 +75,18 @@ public class ATMFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    private void initLayout() {
+    private void renderLayout() {
         gridConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridConstraints.gridx = 0;
         gridConstraints.gridy = 0;
     }
 
-    private void initPanel() {
+    private void renderPanel() {
         gridPanel.setLayout(gridLayout);
         add(gridPanel);
     }
 
-    private void initButtons() {
+    private void renderButtons() {
         addButton(withdraw, "Withdraw");
         addButton(deposit, "Deposit");
         addButton(transferTo, "Transfer To");
@@ -121,7 +122,7 @@ public class ATMFrame extends JFrame {
         }
     }
 
-    private void initRadios() {
+    private void renderRadios() {
         checking = addRadioButton(checking, "Checking");
         savings = addRadioButton(savings, "Savings");
 
@@ -164,7 +165,7 @@ public class ATMFrame extends JFrame {
         }
     }
 
-    private void initInput() {
+    private void renderInput() {
         input = new JTextField();
         addCompontent(input, 2);
     }
