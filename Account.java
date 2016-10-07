@@ -52,6 +52,10 @@ public class Account {
         return balance;
     }
 
+    public String getName () {
+        return name;
+    }
+
     public double getBalance(){ 
         return balance;
     }
@@ -61,6 +65,6 @@ public class Account {
     }
 
     public String toString() {
-        return name + ": " + getBalanceCurrency();
+        return name + " Balance: " + getBalanceCurrency();
     }
 }
