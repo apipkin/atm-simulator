@@ -5,13 +5,24 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
+import java.text.NumberFormat;
+import java.lang.NumberFormatException;
+
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Locale;
+
+
+
 
 public class ATMFrame extends JFrame {
 
@@ -23,6 +34,12 @@ public class ATMFrame extends JFrame {
     static final String NAME = "ATM Simulator",
                         ACCT_CHECKING = "checking",
                         ACCT_SAVING = "saving";
+
+    Locale locale = new Locale("en", "US");
+    NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(locale);
+
+    private Account checkingAccount, savingAccount;
+    private Hashtable<String, Account> accounts = new Hashtable<String, Account>();
 
     private JPanel gridPanel = new JPanel();
     private GridBagLayout gridLayout = new GridBagLayout();
@@ -37,11 +54,6 @@ public class ATMFrame extends JFrame {
 
     private JTextField input;
 
-
-    // Radio buttons for accounts should be created based on the number of accounts using the accounts name... Really?
-
-    // TODO: Look up JOptionPane use
-
     public ATMFrame() {
         super(NAME);
         init();
@@ -52,14 +64,41 @@ public class ATMFrame extends JFrame {
         init();
     }
 
+    /****
+     *
+     *        PUBLIC
+     *
+     ****/
+
     public void display() {
         setVisible(true);
     }
 
+    /****
+     *
+     *        INITIALIZE
+     *
+     ****/
+
     private void init() {
+        initAccounts();
         render();
     }
-    
+
+    private void initAccounts() {
+        checkingAccount = new Account("Checking");
+        accounts.put(ACCT_CHECKING, checkingAccount);
+
+        savingAccount = new Account("Saving");
+        accounts.put(ACCT_SAVING, savingAccount);
+    }
+
+    /****
+     *
+     *        RENDER
+     *
+     ****/
+
     private void render() {
         setFrame(WIDTH, HEIGHT);
         renderLayout();
@@ -154,7 +193,6 @@ public class ATMFrame extends JFrame {
     }
 
     private void handleRadioClick(ActionEvent e) {
-        System.out.println("hadnleRadioClick:: " + e.getActionCommand());
         switch (e.getActionCommand()) {
             case "checking":
                 handleCheckingClick();
@@ -169,7 +207,6 @@ public class ATMFrame extends JFrame {
         input = new JTextField();
         addCompontent(input, 2);
     }
-
 
     private void gridNewRow() {
         gridConstraints.gridx = 0;
@@ -200,45 +237,135 @@ public class ATMFrame extends JFrame {
         }
     }
 
+    /****
+     *
+     *        HANDLERS
+     *
+     ****/
+
     private void handleWithdraw() {
-        System.out.println("handleWithdraw");
-        // is text numeric?
-        // is amount in increments of $20? (not an account concern as any amount can be withdrawn from the account, just not through the ATM)
-        // which account? [checking | savings]
-        // are funds available?
-        // display JOptionPane to display errors or success message
+        try {
+            String val = input.getText();
+            double amount = Double.parseDouble(val);
+
+            if (amount % 20 != 0.0) {
+                displayError("Incorrect Value", "The withrawal amount must be in multiples of $20.");
+                return;
+            }
+
+            Account acct = accounts.get(selectedAccount);
+            acct.withdraw(amount);
+
+            displayBalance(acct, acct.getName() + " Withdraw: " + currencyFormatter.format(amount));
+        }
+        catch (NumberFormatException e) {
+            displayIncorrectValue();
+        }
+        catch (InsufficientFunds e) {
+            displayInsuffientFunds("Your accout does not have the funds necessary to make this withdrawal.");
+        }
     }
 
     private void handleDeposit() {
-        System.out.println("handleDeposit");
-        // is text numeric?
-        // which account? [checking | savings]
-        // deposit funds into selected acount
-        // display JOptionPane with message. balance?
+        try {
+            String val = input.getText();
+            double amount = Double.parseDouble(val);
+
+            Account acct = accounts.get(selectedAccount);
+
+            acct.deposit(amount);
+            displayBalance(acct, acct.getName() + " Deposit: " + currencyFormatter.format(amount));
+        }
+        catch (NumberFormatException e) {
+            displayIncorrectValue();
+        }
     }
 
     private void handleTransfer(){
-        System.out.println("handleTransfer");
+        try {
+            String val = input.getText();
+            double amount = Double.parseDouble(val);
 
-        // is text numeric?
-        // which account? [checking | savings]
-        // are funds available?
-        // display JOptionPane to display errors or success message
+            Account toAccount = accounts.get(selectedAccount);
+            Account fromAccount = accounts.get((selectedAccount == ACCT_CHECKING) ? ACCT_SAVING : ACCT_CHECKING);
+
+            fromAccount.transferTo(toAccount, amount);
+
+            String msg = String.format("Transfered: %s\nFrom: %s\nTo: %s", currencyFormatter.format(amount), fromAccount.getName(), toAccount.getName());
+            displayBalances(msg);
+        }
+        catch (NumberFormatException e) {
+            displayIncorrectValue();
+        }
+        catch (InsufficientFunds e) {
+            displayInsuffientFunds("Your accout does not have the funds necessary to make this withdrawal.");
+        }
     }
 
     private void handleBalance() {
-        System.out.println("handleBalance");
-
-        // which account? [checking | savings]
-        // display JOptionPane with message. balance?
+        displayBalance(accounts.get(selectedAccount));
     }
 
     private void handleCheckingClick() {
-        System.out.println("handleCheckingClick");
         selectedAccount = ACCT_CHECKING;
     }
 
     private void handleSavingsClick() {
         selectedAccount = ACCT_SAVING;
+    }
+
+    /****
+     *
+     *        ACTIONS
+     *
+     ****/
+
+    private void displayBalance(Account acct) {
+        displayBalance(acct, "");
+    }
+
+    private void displayBalance(Account acct, String msg) {
+
+        if (msg != null && !msg.trim().isEmpty()) {
+            msg += "\n\n------------------------------\n";
+        }
+
+        msg += acct;
+
+        JOptionPane.showMessageDialog(this, msg, acct.getName() + " Balance", JOptionPane.PLAIN_MESSAGE);
+    }
+
+    private void displayBalances() {
+        displayBalances("");
+    }
+
+    private void displayBalances(String msg) {
+
+        if (msg != null && !msg.trim().isEmpty()) {
+            msg += "\n\n------------------------------";
+        }
+
+        Enumeration accts = accounts.keys();
+        String key;
+
+        while(accts.hasMoreElements()) {
+            key = (String) accts.nextElement();
+            msg += "\n" + accounts.get(key);
+        }
+
+        JOptionPane.showMessageDialog(this, msg, "Account Balances", JOptionPane.PLAIN_MESSAGE);
+    }
+
+
+    private void displayError(String title, String msg) {
+        JOptionPane.showMessageDialog(this, msg, title, JOptionPane.ERROR_MESSAGE);
+    }
+
+    private void displayIncorrectValue() {
+        displayError("Incorrect Value", "Please enter a currency value using only numbers and a decimal.");
+    }
+
+    private void displayInsuffientFunds(String msg) {
+        displayError("Insufficient Funds", msg);
     }
 }
