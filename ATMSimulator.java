@@ -24,7 +24,7 @@ import java.util.Locale;
 
 
 
-public class ATMFrame extends JFrame {
+public class ATMSimulator extends JFrame {
 
     static final int WIDTH = 300,
                      HEIGHT = 200,
@@ -54,12 +54,12 @@ public class ATMFrame extends JFrame {
 
     private JTextField input;
 
-    public ATMFrame() {
+    public ATMSimulator() {
         super(NAME);
         init();
     }
 
-    public ATMFrame(String name) {
+    public ATMSimulator(String name) {
         super(name);
         init();
     }
