@@ -262,7 +262,7 @@ public class ATMSimulator extends JFrame {
             displayIncorrectValue();
         }
         catch (InsufficientFunds e) {
-            displayInsuffientFunds("Your accout does not have the funds necessary to make this withdrawal.");
+            displayInsuffientFunds(e.getMessage());
         }
     }
 
@@ -298,7 +298,7 @@ public class ATMSimulator extends JFrame {
             displayIncorrectValue();
         }
         catch (InsufficientFunds e) {
-            displayInsuffientFunds("Your accout does not have the funds necessary to make this withdrawal.");
+            displayInsuffientFunds(e.getMessage());
         }
     }
 
