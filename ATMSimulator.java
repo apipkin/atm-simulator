@@ -42,12 +42,12 @@ public class ATMSimulator extends JFrame {
 
     static final String NAME = "ATM Simulator",
                         ACCT_CHECKING = "checking",
-                        ACCT_SAVING = "saving";
+                        ACCT_SAVINGS = "savings";
 
     Locale locale = new Locale("en", "US");
     NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(locale);
 
-    private Account checkingAccount, savingAccount;
+    private Account checkingAccount, savingsAccount;
     private Hashtable<String, Account> accounts = new Hashtable<String, Account>();
 
     private JPanel gridPanel = new JPanel();
@@ -108,8 +108,8 @@ public class ATMSimulator extends JFrame {
         checkingAccount = new Account("Checking");
         accounts.put(ACCT_CHECKING, checkingAccount);
 
-        savingAccount = new Account("Saving");
-        accounts.put(ACCT_SAVING, savingAccount);
+        savingsAccount = new Account("Savings");
+        accounts.put(ACCT_SAVINGS, savingsAccount);
     }
 
     ///////////
@@ -216,7 +216,7 @@ public class ATMSimulator extends JFrame {
                 checking.setSelected(true);
                 group.setSelected(checking.getModel(), true);
                 break;
-            case ACCT_SAVING:
+            case ACCT_SAVINGS:
                 savings.setSelected(true);
                 group.setSelected(savings.getModel(), true);
                 break;
@@ -327,7 +327,7 @@ public class ATMSimulator extends JFrame {
             double amount = Double.parseDouble(val);
 
             if (amount % 20 != 0.0) {
-                displayError("Incorrect Value", "The withrawal amount must be in multiples of $20.");
+                displayError("Incorrect Value", "The withdrawal amount must be in multiples of $20.");
                 return;
             }
 
@@ -373,11 +373,11 @@ public class ATMSimulator extends JFrame {
             double amount = Double.parseDouble(val);
 
             Account toAccount = accounts.get(selectedAccount);
-            Account fromAccount = accounts.get((selectedAccount == ACCT_CHECKING) ? ACCT_SAVING : ACCT_CHECKING);
+            Account fromAccount = accounts.get((selectedAccount == ACCT_CHECKING) ? ACCT_SAVINGS : ACCT_CHECKING);
 
             fromAccount.transferTo(toAccount, amount);
 
-            String msg = String.format("Transfered: %s\nFrom: %s\nTo: %s", currencyFormatter.format(amount), fromAccount.getName(), toAccount.getName());
+            String msg = String.format("Transferred: %s\nFrom: %s\nTo: %s", currencyFormatter.format(amount), fromAccount.getName(), toAccount.getName());
             displayBalances(msg);
         }
         catch (NumberFormatException e) {
@@ -406,7 +406,7 @@ public class ATMSimulator extends JFrame {
      * Sets the saving account to the selected state
      */
     private void handleSavingsClick() {
-        selectedAccount = ACCT_SAVING;
+        selectedAccount = ACCT_SAVINGS;
     }
 
      ///////////
